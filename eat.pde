@@ -1,10 +1,12 @@
 //dimenX = 9, dimenY = 9
 
 int bC = 600;
+int tC = 800;
 int hp = 500;
 int hung = 500;
 int[][] map = new int[200][200];
 int[][] berries = new int[bC][3];
+int[][] trees = new int[tC][3];
 int pB = 0; //player's berries
 int cellWidth = 112;
 int px = 100, py = 100;
@@ -97,6 +99,9 @@ void setup(){
     berries[b][2] = int(random(3, 10));
     map[rx][ry] = 2;
   }
+  for(int t = 0; t < tC; t++){
+    int tx, ty;
+  }
   for(int r = 0; r < 200; r++){
     for(int c = 0; c < 200; c++){
       if(r == px && c == py){
@@ -116,15 +121,15 @@ void draw(){
   else if (hung < 125){
     hp -= 0.3;
   }
-    
+  hung -= 0.15;
   if (hung > 500){ hung = 500; }
   
   if(keyPressed){
     if (keyCode >= 37 && keyCode <= 40){
-      hung -= 2;
+      hung -= 1.75;
     }
     else if(key == ' '){
-      hung -= 0.5;
+      hung -= 0.25;
     }
     
     if(hung <= 0){
@@ -250,9 +255,10 @@ void draw(){
         }
       }
     }
-    if(key == 'c' || key == 'C'){
+    if((key == 'c' || key == 'C') && pB > 0){
+      println(pB);
       pB--;
-      hung += 15;
+      hung += 50;
       delay(200);
     }
   }
