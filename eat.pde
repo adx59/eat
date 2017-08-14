@@ -60,6 +60,20 @@ void renderMap(){
         textSize(42);
         text(str(bush), cellWidth/2 - textWidth(str(bush))/2 + scX, cellWidth/1.65 + scY);
       }
+      else if(map[r][c] == 3){
+        int wood = 0;
+        for(int t = 0; t < tC; t++){
+          if(r == trees[t][0] && c == trees[t][1]){
+            wood = trees[t][2];
+          }
+        }
+        strokeWeight(7);
+        fill(114, 85, 65);
+        rect(scX, scY, cellWidth, cellWidth);
+        fill(255, 255, 255);
+        textSize(42);
+        text(str(wood), cellWidth/2 - textWidth(str(wood))/2 + scX, cellWidth/1.65 + scY);
+      }
     }
   }
   String pos = "(" + str(px) + ", " + str(py) + ")";
@@ -100,16 +114,29 @@ void setup(){
     map[rx][ry] = 2;
   }
   for(int t = 0; t < tC; t++){
-    int tx, ty;
+    int tx = int(random(200)), ty = int(random(200));
+    for(int b = 0; b < bC; b++){
+      while(tx == berries[b][0] && ty == berries[b][1]){
+        tx = int(random(200));
+        ty = int(random(200));
+      }
+    }
+    for(int tr = 0; tr < t; tr++){
+      while(trees[tr][0] == tx && trees[tr][1] == ty){
+        tx = int(random(200));
+        ty = int(random(200));
+      }
+    }
+    trees[t][0] = tx;
+    trees[t][1] = ty;
+    trees[t][2] = int(random(3, 15));
+    map[tx][ty] = 3;
   }
   for(int r = 0; r < 200; r++){
     for(int c = 0; c < 200; c++){
       if(r == px && c == py){
         map[r][c] = 1;     
       }  
-      else if(map[r][c] != 2){
-        map[r][c] = 0;
-      }
     }
   }
 }
@@ -142,6 +169,11 @@ void draw(){
           map[px][py] = 2;        
         }
       }
+      for(int t = 0; t < tC; t++){
+        if(trees[t][0] == px && trees[t][1] == py){
+          map[px][py] = 3;        
+        }
+      }
       px--;
       if(px < 0){
         px = 0;
@@ -165,6 +197,11 @@ void draw(){
           map[px][py] = 2;        
         }
       }
+      for(int t = 0; t < tC; t++){
+        if(trees[t][0] == px && trees[t][1] == py){
+          map[px][py] = 3;        
+        }
+      }
       px++;
       if(px < 0){
         px = 0;
@@ -186,6 +223,11 @@ void draw(){
       for(int b = 0; b < bC; b++){
         if(berries[b][0] == px && berries[b][1] == py){
           map[px][py] = 2;        
+        }
+      }
+      for(int t = 0; t < tC; t++){
+        if(trees[t][0] == px && trees[t][1] == py){
+          map[px][py] = 3;        
         }
       }
       py--;
@@ -256,7 +298,6 @@ void draw(){
       }
     }
     if((key == 'c' || key == 'C') && pB > 0){
-      println(pB);
       pB--;
       hung += 50;
       delay(200);
