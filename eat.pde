@@ -382,6 +382,28 @@ void draw(){
       fires.add(f);
       map[fx][fy] = 4;
     }
+    if (key == 'v' || key == 'V'){
+      int fx = 0; int fy = 0;
+      if(pFace == 1){
+        fx = px; fy = py-1;
+      }
+      else if (pFace == 2){
+        fx = px+1; fy = py;
+      }
+      else if (pFace == 3){
+        fx = px; fy = py+1;
+      }
+      else if(pFace == 4){
+        fx = px-1; fy = py;
+      }
+      for(Fire f : fires){
+        if(f.posx == fx && f.posy == fy){
+          f.warmth--;
+          warm += 100;
+          delay(200);
+        }
+      }
+    }
   }
   renderMap();
   delay(100);
