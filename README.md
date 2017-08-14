@@ -3,6 +3,6 @@ A game where the player traverses around the map made of cells, harvests food fr
 
 <p align = "center">
   <img src = "/ex/img.png">
-<\p>
+</p>
 
 
