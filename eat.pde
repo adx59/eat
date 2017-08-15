@@ -23,6 +23,26 @@ int pW = 0; //player's wood
 int cellWidth = 112;
 int px = 100, py = 100;
 int pFace = 4;
+boolean end = false;
+int starttime = hour()*3600 + minute()*60 + second();
+int endtime;
+
+void endScreen(){
+  int score = endtime - starttime;
+  background(0, 0, 0);
+  textSize(200);
+  fill(255, 255, 255);
+  text("YOU DIED", 1008/2 - textWidth("YOU DIED")/2, 200);
+  textSize(50);
+  text("Sadly, all journeys must come to an end.", 1008/2 - textWidth("Sadly, all journeys must come to an end.")/2, 300);
+  text("But you played a great game.", 1008/2 - textWidth("But you played a great game.")/2, 370);
+  textSize(70);
+  text("YOUR JOURNEY LASTED", 1008/2 - textWidth("YOUR JOURNEY LASTED")/2, 600);
+  fill(0, 255, 0);
+  text(str(score), 1008/2 - textWidth(str(score))/2, 700);
+  fill(255, 255, 255);
+  text("SECONDS", 1008/2 - textWidth("SECONDS")/2, 800);
+}
 
 void renderMap(){
   for(int r = px-4; r <= px+4; r++){
@@ -187,26 +207,31 @@ void setup(){
 }
 
 void draw(){
+  if(end){
+    endScreen();
+    return;
+  }
+  
+  if(hp <= 0){
+    endtime = hour()*3600 + minute()*60 + second();
+    end = true;
+  }
+  
   warm -= 0.5; hung -= 1.0;
   
   if (hung < 50){
     hp -= 0.9;
   }
-  else if (hung < 125){
+  else if (hung < 200){
     hp -= 0.3;
   }
   
   if (warm < 50){
     hp -= 1.2;
   }
-  else if(warm < 125){
+  else if(warm < 200){
     hp -= 0.8;
   }
-  
-  if (hung > 500){ hung = 500; }
-  if (warm > 500){ warm = 500; }
-  if (hung <= 0){ hung = 0; }
-  if (warm <= 0){ warm = 0; }
   
   if(keyPressed){
     if (keyCode >= 37 && keyCode <= 40){
@@ -405,6 +430,14 @@ void draw(){
       }
     }
   }
+  
+  if (hung > 500){ hung = 500; }
+  if (warm > 500){ warm = 500; }
+  if (hung <= 0){ hung = 0; }
+  if (warm <= 0){ warm = 0; }
+  
+  if(hp <= 0){ hp = 0; }
+  
   renderMap();
   delay(100);
 }
