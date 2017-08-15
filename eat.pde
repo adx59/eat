@@ -12,15 +12,19 @@ class Fire{
 
 int bC = 600; //berry count
 int tC = 800; //tree count
+int wC = 1000; //water count
 float hp = 500.0;
 float hung = 500.0;
 float warm = 500.0;
+float thirst = 500.0;
 //2d array of the map
 int[][] map = new int[200][200];
 //2d array of berry tree locations and berry count
 int[][] berries = new int[bC][3];
 //2d array of tree locations and wood count
 int[][] trees = new int[tC][3];
+//2d array of water locations and water left
+int[][] water = new int[wC][3];
 //arraylist of fires the player has set down
 ArrayList<Fire> fires = new ArrayList<Fire>();
 int pB = 0; //player's berries
@@ -81,6 +85,9 @@ void viewMap(){
       }
       else if(map[int(r)][int(c)] == 4){
         fill(255, 185, 0);
+      }
+      else if(map[int(r)][int(c)] == 5){
+        fill(131, 181, 255);
       }
       rect(pxx, pxy, csize, csize);
     }
@@ -165,6 +172,20 @@ void renderMap(){
         }
         text(str(wleft), cellWidth/2 - textWidth(str(wleft))/2 + scX, cellWidth/1.65 + scY);
       }
+      else if(map[r][c] == 5){
+        int liqleft = 0;
+        strokeWeight(7);
+        fill(131, 181, 255);
+        rect(scX, scY, cellWidth, cellWidth);
+        fill(255, 255, 255);
+        textSize(42);
+        for(int w = 0; w < wC; w++){
+          if(water[w][0] == r && water[w][1] == c){
+            liqleft = water[w][2];
+          }
+        }
+        text(str(liqleft), cellWidth/2 - textWidth(str(liqleft))/2 + scX, cellWidth/1.65 + scY);
+      }
     }
   }
   //draw position indicator
@@ -186,8 +207,11 @@ void renderMap(){
   fill(255, 255, 255);
   text(str(pW), (50 - textWidth(str(pW))/2) + 140,  90);
   
+  stroke(0, 0, 0);
+  strokeWeight(2);
+  
   //draw HP bar
-  fill(255, 0, 0); noStroke();
+  fill(255, 0, 0); 
   rect(50, 933, hp/1.5, 50);
   textSize(24);
   fill(255, 255, 255);
@@ -203,7 +227,13 @@ void renderMap(){
   fill(225, 225, 0);
   rect(50, 833, warm/1.5, 50);
   fill(255, 255, 255);
-  text("WARMTH", 60, 872);
+  text("WARMTH", 60, 870);
+  
+  //draw THIRST bar
+  fill(145, 187, 255);
+  rect(50, 783, thirst/1.5, 50);
+  fill(255, 255, 255);
+  text("THIRST", 60, 820);
 }
 
 void setup(){
@@ -240,6 +270,31 @@ void setup(){
     trees[t][2] = int(random(3, 15));
     map[tx][ty] = 3;
   }
+  for(int w = 0; w < wC; w++){
+    int wx = int(random(200)), wy = int(random(200));
+    for(int b = 0; b < bC; b++){
+      while(wx == berries[b][0] && wy == berries[b][1]){
+        wx = int(random(200));
+        wy = int(random(200));
+      }
+    }
+    for(int tr = 0; tr < tC; tr++){
+      while(trees[tr][0] == wx && trees[tr][1] == wy){
+        wx = int(random(200));
+        wy = int(random(200));
+      }
+    }
+    for(int wa = 0; wa < w; wa++){
+      while(water[wa][0] == wx && water[wa][1] == wy){
+        wx = int(random(200));
+        wy = int(random(200));
+      }
+    }
+    water[w][0] = wx;
+    water[w][1] = wy;
+    water[w][2] = int(random(3, 10));
+    map[wx][wy] = 5;
+  }
   for(int r = 0; r < 200; r++){
     for(int c = 0; c < 200; c++){
       if(r == px && c == py){
@@ -250,6 +305,7 @@ void setup(){
 }
 
 void draw(){
+  int ox = px, oy = py;
   if(!start){
     startScreen();
     return;
@@ -270,7 +326,7 @@ void draw(){
     delay(100);
   }
   
-  warm -= 0.5; hung -= 1.0;
+  warm -= 0.5; hung -= 1.0; thirst -= 1.5;
   
   if (hung < 50){
     hp -= 0.9;
@@ -284,6 +340,12 @@ void draw(){
   }
   else if(warm < 200){
     hp -= 0.8;
+  }
+  if(thirst < 20){
+    hp -= 2.0;
+  }
+  else if(thirst < 100){
+    hp -= 1.3;
   }
   
   if(keyPressed){
@@ -320,7 +382,7 @@ void draw(){
         py = 199;
       }
       pFace = 4;
-      map[px][py] = 1;
+      
     }
     else if(keyCode == 39){
       map[px][py] = 0;
@@ -348,7 +410,7 @@ void draw(){
         py = 199;
       }
       pFace = 2;
-      map[px][py] = 1;
+      
     }
     else if(keyCode == 38){
       map[px][py] = 0;
@@ -376,7 +438,7 @@ void draw(){
         py = 199;
       }
       pFace = 1;
-      map[px][py] = 1;
+      
     }
     else if(keyCode == 40){
       map[px][py] = 0;
@@ -404,7 +466,7 @@ void draw(){
         py = 199;
       }
       pFace = 3;
-      map[px][py] = 1;
+      
     }
     
     if(key == 'w' || key == 'W'){pFace = 1;}
@@ -440,6 +502,20 @@ void draw(){
           delay(800);
         }
       }
+      for(Fire f : fires){
+        if(f.posx == tpx && f.posy == tpy){
+          f.warmth--;
+          warm += 100;
+          delay(200);
+        }
+      }
+      for(int w = 0; w < wC; w++){
+        if(water[w][0] == tpx && water[w][1] == tpy && water[w][2] > 0){
+          water[w][2]--;
+          thirst += 400;
+          delay(50);
+        }
+      }
     }
     if((key == 'c' || key == 'C') && pB > 0){
       pB--;
@@ -465,38 +541,28 @@ void draw(){
       fires.add(f);
       map[fx][fy] = 4;
     }
-    if (key == 'v' || key == 'V'){
-      int fx = 0; int fy = 0;
-      if(pFace == 1){
-        fx = px; fy = py-1;
-      }
-      else if (pFace == 2){
-        fx = px+1; fy = py;
-      }
-      else if (pFace == 3){
-        fx = px; fy = py+1;
-      }
-      else if(pFace == 4){
-        fx = px-1; fy = py;
-      }
-      for(Fire f : fires){
-        if(f.posx == fx && f.posy == fy){
-          f.warmth--;
-          warm += 100;
-          delay(200);
-        }
-      }
-    }
     if(key == 'm' || key == 'M'){
       delay(200);
       if(!viewingMap){viewingMap=true;}
     }
   }
   
+  for(int w = 0; w < wC; w++){
+    if(water[w][0] == px && water[w][1] == py){
+      px = ox;
+      py = oy;
+    }
+  }
+  
+  map[px][py] = 1;
+  
   if (hung > 500){ hung = 500; }
   if (warm > 500){ warm = 500; }
+  if (thirst > 500){ thirst = 500; }
   if (hung <= 0){ hung = 0; }
   if (warm <= 0){ warm = 0; }
+  if (thirst <= 0){ thirst = 0; }
+  
   
   if(hp <= 0){ hp = 0; }
   
