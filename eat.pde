@@ -28,9 +28,21 @@ int pW = 0; //player's wood
 int cellWidth = 112;
 int px = 100, py = 100; //player position
 int pFace = 4; //player faces which direction
+boolean start = false;
 boolean end = false; 
+boolean viewingMap = false;
 int starttime = hour()*3600 + minute()*60 + second();
 int endtime;
+
+void startScreen(){
+  background(0, 0, 0);
+  textSize(200);
+  fill(255, 255, 255);
+  text("EAT" , 1008/2 - textWidth("EAT")/2, 400);
+  textSize(80);
+  text("Press any key to start.", 1008/2 - textWidth("Press any key to start.")/2, 600);
+  if(keyPressed){start = true;}
+}
 
 void endScreen(){
   int score = endtime - starttime;
@@ -47,6 +59,32 @@ void endScreen(){
   text(str(score), 1008/2 - textWidth(str(score))/2, 700);
   fill(255, 255, 255);
   text("SECONDS", 1008/2 - textWidth("SECONDS")/2, 800);
+}
+
+void viewMap(){
+  noStroke();
+  float csize = 1008.0/200.0;
+  for(float r = 0.0; r < 200; r += 1.0){
+    for(float c = 0.0; c < 200; c += 1.0){
+      float pxx = r * csize, pxy = c * csize;
+      if(map[int(r)][int(c)] == 0){
+        fill(42, 178, 51);
+      }
+      else if(map[int(r)][int(c)] == 1){
+        fill(255, 255, 255);
+      }
+      else if(map[int(r)][int(c)] == 2){
+        fill(105, 0, 107);
+      }
+      else if(map[int(r)][int(c)] == 3){
+        fill(142, 105, 81);
+      }
+      else if(map[int(r)][int(c)] == 4){
+        fill(255, 185, 0);
+      }
+      rect(pxx, pxy, csize, csize);
+    }
+  }
 }
 
 void renderMap(){
@@ -212,11 +250,20 @@ void setup(){
 }
 
 void draw(){
+  if(!start){
+    startScreen();
+    return;
+  }
   if(end){
     endScreen();
     return;
   }
-  
+  if(viewingMap){
+    viewMap();
+    if(keyPressed && (key == 'm' || key == 'M')){viewingMap = false; delay(200);}
+    delay(100);
+    return;
+  }
   if(hp <= 0){
     endtime = hour()*3600 + minute()*60 + second();
     end = true;
@@ -338,6 +385,11 @@ void draw(){
           map[px][py] = 2;        
         }
       }
+      for(int t = 0; t < tC; t++){
+        if(trees[t][0] == px && trees[t][1] == py){
+          map[px][py] = 3;        
+        }
+      }
       py++;
       if(px < 0){
         px = 0;
@@ -434,6 +486,10 @@ void draw(){
           delay(200);
         }
       }
+    }
+    if(key == 'm' || key == 'M'){
+      delay(200);
+      if(!viewingMap){viewingMap=true;}
     }
   }
   
