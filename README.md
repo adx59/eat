@@ -15,9 +15,11 @@ To consume berries, press the 'c' key.
 To craft fire, press the 'f' key. The fire will automatically appear in the cell you are facing.
 
 ![Screenshot](ex/fire.PNG)
+
 To see the entire map, press 'm'. Press 'm' to go back to player view afterwards.
 
 ![Screenshot](ex/entmap.PNG)
+
 # Notes/Bugs
 Please note that once you stamp on fire, it will go out. IT'S NOT A BUG, IT'S A FEATURE
 
