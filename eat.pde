@@ -1,5 +1,6 @@
 //dimenX = 9, dimenY = 9
 
+//fire class, so we don't have to use a 2d arraylist(if that exists)
 class Fire{
   int posx = 0, posy = 0, warmth = 0;
   Fire(int x, int y){
@@ -9,21 +10,25 @@ class Fire{
   }
 }
 
-int bC = 600;
-int tC = 800;
+int bC = 600; //berry count
+int tC = 800; //tree count
 float hp = 500.0;
 float hung = 500.0;
 float warm = 500.0;
+//2d array of the map
 int[][] map = new int[200][200];
+//2d array of berry tree locations and berry count
 int[][] berries = new int[bC][3];
+//2d array of tree locations and wood count
 int[][] trees = new int[tC][3];
+//arraylist of fires the player has set down
 ArrayList<Fire> fires = new ArrayList<Fire>();
 int pB = 0; //player's berries
 int pW = 0; //player's wood
 int cellWidth = 112;
-int px = 100, py = 100;
-int pFace = 4;
-boolean end = false;
+int px = 100, py = 100; //player position
+int pFace = 4; //player faces which direction
+boolean end = false; 
 int starttime = hour()*3600 + minute()*60 + second();
 int endtime;
 
@@ -215,6 +220,7 @@ void draw(){
   if(hp <= 0){
     endtime = hour()*3600 + minute()*60 + second();
     end = true;
+    delay(100);
   }
   
   warm -= 0.5; hung -= 1.0;
