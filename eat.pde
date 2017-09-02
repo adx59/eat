@@ -31,12 +31,16 @@ int pB = 0; //player's berries
 int pW = 0; //player's wood
 int cellWidth = 112;
 int px = 100, py = 100; //player position
-int pFace = 4; //player faces which direction
+int pFace = 4; //player faces which direction  
 boolean start = false;
 boolean end = false; 
 boolean viewingMap = false;
 int starttime = hour()*3600 + minute()*60 + second();
 int endtime;
+//assets
+PImage[] facing = new PImage[4];
+PImage[] bushes = new PImage[11];
+PImage grass;
 
 void startScreen(){
   background(0, 0, 0);
@@ -65,179 +69,26 @@ void endScreen(){
   text("SECONDS", 1008/2 - textWidth("SECONDS")/2, 800);
 }
 
-void viewMap(){
-  noStroke();
-  float csize = 1008.0/200.0;
-  for(float r = 0.0; r < 200; r += 1.0){
-    for(float c = 0.0; c < 200; c += 1.0){
-      float pxx = r * csize, pxy = c * csize;
-      if(map[int(r)][int(c)] == 0){
-        fill(42, 178, 51);
-      }
-      else if(map[int(r)][int(c)] == 1){
-        fill(255, 255, 255);
-      }
-      else if(map[int(r)][int(c)] == 2){
-        fill(105, 0, 107);
-      }
-      else if(map[int(r)][int(c)] == 3){
-        fill(142, 105, 81);
-      }
-      else if(map[int(r)][int(c)] == 4){
-        fill(255, 185, 0);
-      }
-      else if(map[int(r)][int(c)] == 5){
-        fill(131, 181, 255);
-      }
-      rect(pxx, pxy, csize, csize);
-    }
-  }
-}
-
-void renderMap(){
-  for(int r = px-4; r <= px+4; r++){
-    for(int c = py-4; c <= py+4; c++){
-      int scX = (r - (px - 4)) * cellWidth, scY = (c - (py - 4)) * cellWidth;
-      stroke(255, 255, 255);
-      if(r < 0 || c < 0 || r > 199 || c > 199){
-        strokeWeight(5);
-        fill(0, 0, 0);
-        rect(scX, scY, cellWidth, cellWidth);
-      }
-      else if(map[r][c] == 0){
-        strokeWeight(5); //draw grass
-        fill(42, 178, 51);
-        rect(scX, scY, cellWidth, cellWidth);
-      }
-      else if(map[r][c] == 1){
-        strokeWeight(10); //draw player
-        fill(16, 36, 183);
-        rect(scX, scY, cellWidth, cellWidth);
-        noStroke(); fill(255, 255, 255);
-        //draw player facing indicator
-        if(pFace == 1){
-          rect(scX, scY, cellWidth, cellWidth/6);
-        }
-        else if(pFace == 2){
-          rect(scX + (5*cellWidth)/6 , scY, cellWidth/6, cellWidth );
-        }
-        else if(pFace == 3){
-          rect(scX, scY + (5*cellWidth)/6, cellWidth, cellWidth/6);
-        }
-        else if(pFace == 4){
-          rect(scX, scY, cellWidth/6, cellWidth);
-        }
-      }
-      else if(map[r][c] == 2){
-        //draw berries
-        int bush = 0;
-        for(int b = 0; b < bC; b++){
-          if(r == berries[b][0] && c == berries[b][1]){
-            bush = berries[b][2];
-          }
-        }
-        strokeWeight(7);
-        fill(int(random(90, 120)), 0, int(random(100, 114)));
-        rect(scX, scY, cellWidth, cellWidth);
-        fill(255, 255, 255);
-        textSize(42);
-        text(str(bush), cellWidth/2 - textWidth(str(bush))/2 + scX, cellWidth/1.65 + scY);
-      }
-      else if(map[r][c] == 3){
-        //draw trees
-        int wood = 0;
-        for(int t = 0; t < tC; t++){
-          if(r == trees[t][0] && c == trees[t][1]){
-            wood = trees[t][2];
-          }
-        }
-        strokeWeight(7);
-        fill(142, 105, 81);
-        rect(scX, scY, cellWidth, cellWidth);
-        fill(255, 255, 255);
-        textSize(42);
-        text(str(wood), cellWidth/2 - textWidth(str(wood))/2 + scX, cellWidth/1.65 + scY);
-      }
-      else if(map[r][c] == 4){
-        int wleft = 0;
-        strokeWeight(7);
-        fill(255, 185, 0);
-        rect(scX, scY, cellWidth, cellWidth);
-        fill(255, 255, 255);
-        textSize(42);
-        for(Fire f: fires){
-          if(f.posx == r && f.posy == c){
-            wleft = f.warmth;
-          }
-        }
-        text(str(wleft), cellWidth/2 - textWidth(str(wleft))/2 + scX, cellWidth/1.65 + scY);
-      }
-      else if(map[r][c] == 5){
-        int liqleft = 0;
-        strokeWeight(7);
-        fill(131, 181, 255);
-        rect(scX, scY, cellWidth, cellWidth);
-        fill(255, 255, 255);
-        textSize(42);
-        for(int w = 0; w < wC; w++){
-          if(water[w][0] == r && water[w][1] == c){
-            liqleft = water[w][2];
-          }
-        }
-        text(str(liqleft), cellWidth/2 - textWidth(str(liqleft))/2 + scX, cellWidth/1.65 + scY);
-      }
-    }
-  }
-  //draw position indicator
-  String pos = "(" + str(px) + ", " + str(py) + ")";
-  fill(0, 0, 255); textSize(50);
-  text(pos, 1008/2 - textWidth(pos)/2, 50); //<>//
-  
-  //draw Berries Collected indicator
-  fill(191, 0, 149);
-  noStroke();
-  rect(20, 20, 100, 100);
-  fill(255, 255, 255);
-  text(str(pB), (50 - textWidth(str(pB))/2) + 20,  90);
-  
-  //draw Wood Collected indicator
-  fill(142, 105, 81);
-  noStroke();
-  rect(140, 20, 100, 100);
-  fill(255, 255, 255);
-  text(str(pW), (50 - textWidth(str(pW))/2) + 140,  90);
-  
-  stroke(0, 0, 0);
-  strokeWeight(2);
-  
-  //draw HP bar
-  fill(255, 0, 0); 
-  rect(50, 933, hp/1.5, 50);
-  textSize(24);
-  fill(255, 255, 255);
-  text("HP", 60, 968);
-  
-  //draw HUNGER bar
-  fill(255, 125, 0);
-  rect(50, 883, hung/1.5, 50);
-  fill(255, 255, 255);
-  text("HUNGER", 60, 920);
-  
-  //draw WARMTH bar
-  fill(225, 225, 0);
-  rect(50, 833, warm/1.5, 50);
-  fill(255, 255, 255);
-  text("WARMTH", 60, 870);
-  
-  //draw THIRST bar
-  fill(145, 187, 255);
-  rect(50, 783, thirst/1.5, 50);
-  fill(255, 255, 255);
-  text("THIRST", 60, 820);
-}
-
+ //<>//
 void setup(){
   size(1008, 1008);
+  //load images
+  facing[0] = loadImage("assets/f1.png");
+  facing[1] = loadImage("assets/f2.png");
+  facing[2] = loadImage("assets/f3.png");
+  facing[3] = loadImage("assets/f4.png");
+  grass = loadImage("assets/grass.png");
+  bushes[0] = loadImage("assets/b0.png");
+  bushes[1] = loadImage("assets/b1.png");
+  bushes[2] = loadImage("assets/b2.png");
+  bushes[3] = loadImage("assets/b3.png");
+  bushes[4] = loadImage("assets/b4.png");
+  bushes[5] = loadImage("assets/b5.png");
+  bushes[6] = loadImage("assets/b6.png");
+  bushes[7] = loadImage("assets/b7.png");
+  bushes[8] = loadImage("assets/b8.png");
+  bushes[9] = loadImage("assets/b9.png");
+  bushes[10] = loadImage("assets/b10.png");
   for(int b = 0; b < bC; b++){
     int rx = int(random(200)), ry = int(random(200));
     for(int pBs = 0; pBs < b; pBs++){
@@ -303,6 +154,8 @@ void setup(){
     }
   }
 }
+
+
 
 void draw(){
   int ox = px, oy = py;
@@ -549,6 +402,12 @@ void draw(){
   
   for(int w = 0; w < wC; w++){
     if(water[w][0] == px && water[w][1] == py){
+      px = ox;
+      py = oy;
+    }
+  }
+  for(int t = 0; t < tC; t++){
+    if(trees[t][0] == px && trees[t][1] == py){
       px = ox;
       py = oy;
     }
