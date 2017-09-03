@@ -46,39 +46,50 @@ void renderMap(){
           }
         }
         
-        fill(142, 105, 81);
-        rect(scX, scY, cellWidth, cellWidth);
-        fill(255, 255, 255);
-        textSize(42);
-        text(str(wood), cellWidth/2 - textWidth(str(wood))/2 + scX, cellWidth/1.65 + scY);
+        if (wood > 0){
+          image(tree, scX, scY);
+        }
+        else{
+          image(grass, scX, scY);
+        }
       }
       else if(map[r][c] == 4){
         int wleft = 0;
-        
-        fill(255, 185, 0);
-        rect(scX, scY, cellWidth, cellWidth);
-        fill(255, 255, 255);
-        textSize(42);
         for(Fire f: fires){
           if(f.posx == r && f.posy == c){
             wleft = f.warmth;
           }
         }
-        text(str(wleft), cellWidth/2 - textWidth(str(wleft))/2 + scX, cellWidth/1.65 + scY);
+        if (wleft > 0){
+          image(fire, scX, scY);
+        }
+        else{
+          image(deadfire, scX, scY);
+        }
+        
       }
       else if(map[r][c] == 5){
         int liqleft = 0;
-        
-        fill(131, 181, 255);
-        rect(scX, scY, cellWidth, cellWidth);
-        fill(255, 255, 255);
-        textSize(42);
         for(int w = 0; w < wC; w++){
           if(water[w][0] == r && water[w][1] == c){
             liqleft = water[w][2];
           }
         }
-        text(str(liqleft), cellWidth/2 - textWidth(str(liqleft))/2 + scX, cellWidth/1.65 + scY);
+        if (liqleft > 7){
+          image(waters[4], scX, scY);
+        }
+        else if (liqleft > 4){
+          image(waters[3], scX, scY);
+        }
+        else if (liqleft > 2){
+          image(waters[2], scX, scY);
+        }
+        else if(liqleft > 0){
+          image(waters[1], scX, scY);
+        }
+        else if(liqleft == 0){
+          image(waters[0], scX, scY);
+        }
       }
     }
   }

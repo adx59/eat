@@ -37,10 +37,15 @@ boolean end = false;
 boolean viewingMap = false;
 int starttime = hour()*3600 + minute()*60 + second();
 int endtime;
-//assets
+//   ---   asset vars   ---   
 PImage[] facing = new PImage[4];
 PImage[] bushes = new PImage[11];
+PImage[] waters = new PImage[5];
 PImage grass;
+PImage tree;
+PImage fire;
+PImage deadfire;
+//   ----------------------   
 
 void startScreen(){
   background(0, 0, 0);
@@ -71,8 +76,9 @@ void endScreen(){
 
  //<>//
 void setup(){
+  frameRate(10);
   size(1008, 1008);
-  //load images
+  // --------------  load images  ----------------
   facing[0] = loadImage("assets/f1.png");
   facing[1] = loadImage("assets/f2.png");
   facing[2] = loadImage("assets/f3.png");
@@ -89,6 +95,18 @@ void setup(){
   bushes[8] = loadImage("assets/b8.png");
   bushes[9] = loadImage("assets/b9.png");
   bushes[10] = loadImage("assets/b10.png");
+  tree = loadImage("assets/newtree.png");
+  waters[0] = loadImage("assets/w0.png");
+  waters[1] = loadImage("assets/w1.png");
+  waters[2] = loadImage("assets/w2.png");
+  waters[3] = loadImage("assets/w3.png");
+  waters[4] = loadImage("assets/w4.png");
+  fire = loadImage("assets/fire.png");
+  deadfire = loadImage("assets/deadfire.png");
+  // ----------------------------------------------
+  
+  //---------- generate berries, trees, water -------------
+  
   for(int b = 0; b < bC; b++){
     int rx = int(random(200)), ry = int(random(200));
     for(int pBs = 0; pBs < b; pBs++){
@@ -143,9 +161,13 @@ void setup(){
     }
     water[w][0] = wx;
     water[w][1] = wy;
-    water[w][2] = int(random(3, 10));
+    water[w][2] = int(random(3, 11));
     map[wx][wy] = 5;
   }
+  
+  //---------------------------------------------------
+  
+  //put player's original position on map
   for(int r = 0; r < 200; r++){
     for(int c = 0; c < 200; c++){
       if(r == px && c == py){
@@ -158,29 +180,34 @@ void setup(){
 
 
 void draw(){
+  //player original position, before changes
   int ox = px, oy = py;
+  //run start screen(if start)
   if(!start){
     startScreen();
     return;
   }
+  //run end screen(if end)
   if(end){
     endScreen();
     return;
   }
+  //if viewing map, show map
   if(viewingMap){
     viewMap();
     if(keyPressed && (key == 'm' || key == 'M')){viewingMap = false; delay(200);}
     delay(100);
     return;
   }
+  //if dead
   if(hp <= 0){
     endtime = hour()*3600 + minute()*60 + second();
     end = true;
     delay(100);
   }
-  
-  warm -= 0.5; hung -= 1.0; thirst -= 1.5;
-  
+  //decrease stats
+  warm -= 0.3; hung -= 0.9; thirst -= 1.5;
+  //do health decreasing, if thirst/hunger/warmth is below a certain threshold
   if (hung < 50){
     hp -= 0.9;
   }
@@ -201,26 +228,17 @@ void draw(){
     hp -= 1.3;
   }
   
+  // --------------  check for keypresses  ---------------
   if(keyPressed){
     if (keyCode >= 37 && keyCode <= 40){
-      hung -= 1.75;
+      hung -= 1.2;
     }
     else if(key == ' '){
-      hung -= 0.25;
+      hung -= 0.2;
     }
-    
+    //left key
     if(keyCode == 37){
       map[px][py] = 0;
-      for(int b = 0; b < bC; b++){
-        if(berries[b][0] == px && berries[b][1] == py){
-          map[px][py] = 2;        
-        }
-      }
-      for(int t = 0; t < tC; t++){
-        if(trees[t][0] == px && trees[t][1] == py){
-          map[px][py] = 3;        
-        }
-      }
       px--;
       if(px < 0){
         px = 0;
@@ -237,18 +255,9 @@ void draw(){
       pFace = 4;
       
     }
+    //right key
     else if(keyCode == 39){
       map[px][py] = 0;
-      for(int b = 0; b < bC; b++){
-        if(berries[b][0] == px && berries[b][1] == py){
-          map[px][py] = 2;        
-        }
-      }
-      for(int t = 0; t < tC; t++){
-        if(trees[t][0] == px && trees[t][1] == py){
-          map[px][py] = 3;        
-        }
-      }
       px++;
       if(px < 0){
         px = 0;
@@ -265,18 +274,9 @@ void draw(){
       pFace = 2;
       
     }
+    //up key
     else if(keyCode == 38){
       map[px][py] = 0;
-      for(int b = 0; b < bC; b++){
-        if(berries[b][0] == px && berries[b][1] == py){
-          map[px][py] = 2;        
-        }
-      }
-      for(int t = 0; t < tC; t++){
-        if(trees[t][0] == px && trees[t][1] == py){
-          map[px][py] = 3;        
-        }
-      }
       py--;
       if(px < 0){
         px = 0;
@@ -293,18 +293,9 @@ void draw(){
       pFace = 1;
       
     }
+    //down key
     else if(keyCode == 40){
       map[px][py] = 0;
-      for(int b = 0; b < bC; b++){
-        if(berries[b][0] == px && berries[b][1] == py){
-          map[px][py] = 2;        
-        }
-      }
-      for(int t = 0; t < tC; t++){
-        if(trees[t][0] == px && trees[t][1] == py){
-          map[px][py] = 3;        
-        }
-      }
       py++;
       if(px < 0){
         px = 0;
@@ -321,13 +312,14 @@ void draw(){
       pFace = 3;
       
     }
-    
+    //if facing keys are pressed
     if(key == 'w' || key == 'W'){pFace = 1;}
     else if(key == 'a' || key == 'A'){pFace = 4;}
     else if(key == 's' || key == 'S'){pFace = 3;}
     else if(key == 'd' || key == 'D'){pFace = 2;}
-    
+    //mining key pressed
     if(key == ' '){
+      //target square
       int tpx = 0, tpy = 0;
       if(pFace == 1){
         tpx = px; tpy = py-1;
@@ -340,6 +332,7 @@ void draw(){
       }
       else if(pFace == 4){
         tpx = px-1; tpy = py;
+      //check if target square is berries
       }
       for(int b = 0; b < bC; b++){
         if(berries[b][0] == tpx && berries[b][1] == tpy && berries[b][2] > 0){
@@ -348,6 +341,7 @@ void draw(){
           delay(600);
         }
       }
+      //check if target square is trees
       for(int t = 0; t < tC; t++){
         if(trees[t][0] == tpx && trees[t][1] == tpy && trees[t][2] > 0){
           trees[t][2]--;
@@ -355,13 +349,15 @@ void draw(){
           delay(800);
         }
       }
+      //check if target square is fire
       for(Fire f : fires){
-        if(f.posx == tpx && f.posy == tpy){
+        if(f.posx == tpx && f.posy == tpy && f.warmth > 0){
           f.warmth--;
           warm += 100;
           delay(200);
         }
       }
+      //check if target square is water
       for(int w = 0; w < wC; w++){
         if(water[w][0] == tpx && water[w][1] == tpy && water[w][2] > 0){
           water[w][2]--;
@@ -370,11 +366,13 @@ void draw(){
         }
       }
     }
+    //check if consuming berries
     if((key == 'c' || key == 'C') && pB > 0){
       pB--;
       hung += 50;
       delay(200);
     }
+    //if crafting fire
     if((key == 'f' || key == 'F') && pW >= 30){
       int fx = 0; int fy = 0;
       if(pFace == 1){
@@ -394,27 +392,46 @@ void draw(){
       fires.add(f);
       map[fx][fy] = 4;
     }
+    //if viewing map
     if(key == 'm' || key == 'M'){
       delay(200);
       if(!viewingMap){viewingMap=true;}
     }
   }
   
+  // --------------------------------------------------
+  
+  //if player attempting to walk on water/bushes/trees
   for(int w = 0; w < wC; w++){
+    map[water[w][0]][water[w][1]] = 5;
     if(water[w][0] == px && water[w][1] == py){
       px = ox;
       py = oy;
     }
   }
   for(int t = 0; t < tC; t++){
-    if(trees[t][0] == px && trees[t][1] == py){
+    map[trees[t][0]][trees[t][1]] = 3;
+    if(trees[t][0] == px && trees[t][1] == py && trees[t][2] > 0){
       px = ox;
       py = oy;
     }
   }
-  
+  for(int b = 0; b < bC; b++){
+    map[berries[b][0]][berries[b][1]] = 2;
+    if(berries[b][0] == px && berries[b][1] == py){
+      px = ox;
+      py = oy;
+    }
+  }
+  for (Fire f : fires){
+    map[f.posx][f.posy] = 4; 
+    if (px == f.posx && py == f.posy){
+      f.warmth = 0;
+    }
+  }
+  //set map to player position
   map[px][py] = 1;
-  
+  //handle stat limits
   if (hung > 500){ hung = 500; }
   if (warm > 500){ warm = 500; }
   if (thirst > 500){ thirst = 500; }
@@ -422,9 +439,9 @@ void draw(){
   if (warm <= 0){ warm = 0; }
   if (thirst <= 0){ thirst = 0; }
   
-  
   if(hp <= 0){ hp = 0; }
   
+  //render map
   renderMap();
-  delay(100);
+
 }
