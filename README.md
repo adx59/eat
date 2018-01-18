@@ -19,10 +19,3 @@ To craft fire, press the 'f' key. The fire will automatically appear in the cell
 To see the entire map, press 'm'. Press 'm' to go back to player view afterwards.
 
 ![Screenshot](ex/entmap.PNG)
-
-# Notes/Bugs
-Please note that once you stamp on fire, it will go out. IT'S NOT A BUG, IT'S A FEATURE
-
-Sometimes, the game and display will load, but your controls will fail to work. I don't know if something is wrong with my code, or if it is Processing itself.
-
-Some parts of this game make use of Processing 3's new features, so it may not work on Processing 2.
